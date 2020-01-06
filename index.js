@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 5000;
-const users = require("./auth/users");
+const users = require("./auth/auth");
 
 require('dotenv').config()
 

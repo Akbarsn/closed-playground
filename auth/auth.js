@@ -24,7 +24,8 @@ router.post("/login", async (req, res) => {
     }
   } catch (err) {
     res.json({
-      status: "Error"
+      status: "Error",
+      error:err
     });
   }
 });
