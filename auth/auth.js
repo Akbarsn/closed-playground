@@ -4,19 +4,14 @@ const model = require("../models/index");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
-router.post("/register",async (req, res) => {
-  const {
-    name,
-    email,
-    username,
-    password
-  } = req.body;
+router.post("/register", async (req, res) => {
+  const { name, email, username, password } = req.body;
   bcrypt.hash(password, 10, async (err, hash) => {
     if (err) {
       res.status(400).json({
         status: "Error",
         message: "Please Try Again 1"
-      })
+      });
     } else {
       try {
         const user = await model.users.create({
@@ -40,38 +35,50 @@ router.post("/register",async (req, res) => {
         res.status(400).json({
           status: "Error",
           message: "Please Try Again 3"
-        })
+        });
       }
     }
   });
 });
 
 router.post("/login", async (req, res) => {
+  const { username, password } = req.body;
   try {
     const user = await model.users.findOne({
       where: {
-        username: req.body.username
+        username: username
       }
     });
     if (user) {
-      if (user.password === req.body.password) {
-        res.json({
-          status: "Login"
-        });
-      } else {
-        res.json({
-          status: "Password Salah"
-        });
-      }
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) {
+          res.status(400).json({
+            status: "Error",
+            message: "Please Try Again"
+          });
+        } else {
+          if (result) {
+            res.status(200).json({
+              status: "Login Successful"
+            });
+          } else {
+            res.status(406).json({
+              status: "Mistake",
+              message: "Wrong Password"
+            });
+          }
+        }
+      });
     } else {
-      res.json({
-        status: "User tidak ditemukan"
+      res.status(404).json({
+        status: "Error",
+        message: "User not Found"
       });
     }
   } catch (err) {
-    res.json({
+    res.status(400).json({
       status: "Error",
-      error: err
+      message: "Please Try Again"
     });
   }
 });
