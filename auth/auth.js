@@ -2,47 +2,11 @@ const express = require("express");
 const router = express.Router();
 const model = require("../models/index");
 const bcrypt = require("bcryptjs");
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 
-router.post("/register", async (req, res) => {
-  const { name, email, username, password } = req.body;
-  bcrypt.hash(password, 10, async (err, hash) => {
-    if (err) {
-      res.status(400).json({
-        status: "Error",
-        message: "Please Try Again 1"
-      });
-    } else {
-      try {
-        const user = await model.users.create({
-          name,
-          email,
-          username,
-          password: hash
-        });
-        if (user) {
-          res.status(201).json({
-            status: "Registered",
-            message: "Go Login"
-          });
-        } else {
-          res.status(400).json({
-            status: "Error",
-            message: "Please Try Again 2"
-          });
-        }
-      } catch (err) {
-        res.status(400).json({
-          status: "Error",
-          message: "Please Try Again 3"
-        });
-      }
-    }
-  });
-});
-
-router.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  try {
+passport.use(
+  new LocalStrategy(async function(username, password, done) {
     const user = await model.users.findOne({
       where: {
         username: username
@@ -51,35 +15,64 @@ router.post("/login", async (req, res) => {
     if (user) {
       bcrypt.compare(password, user.password, (err, result) => {
         if (err) {
-          res.status(400).json({
-            status: "Error",
-            message: "Please Try Again"
-          });
+          return done(err);
         } else {
           if (result) {
-            res.status(200).json({
-              status: "Login Successful"
-            });
+            return done(null, user);
           } else {
-            res.status(406).json({
-              status: "Mistake",
-              message: "Wrong Password"
-            });
+            return done(null, false);
           }
         }
       });
     } else {
-      res.status(404).json({
-        status: "Error",
-        message: "User not Found"
-      });
+      return done(null, false);
     }
-  } catch (err) {
+  })
+);
+
+router.post(
+  "/login",
+  passport.authenticate("local", { failureRedirect: "/error" }),
+  function(req, res) {
+    res.redirect("/success?username=" + req.user.username);
+  }
+);
+
+router.post("/register", async (req, res) => {
+  const { name, email, username, password } = req.body;
+  const hashing = await bcrypt.hash(password, 10);
+  if (!hashing) {
     res.status(400).json({
       status: "Error",
-      message: "Please Try Again"
+      message: "Please Try Again "
     });
+  } else {
+    try {
+      const user = await model.users.create({
+        name,
+        email,
+        username,
+        password: hash
+      });
+      if (user) {
+        res.status(201).json({
+          status: "Registered",
+          message: "Go Login"
+        });
+      } else {
+        res.status(400).json({
+          status: "Error",
+          message: "Please Try Again "
+        });
+      }
+    } catch (err) {
+      res.status(400).json({
+        status: "Error",
+        message: "Please Try Again "
+      });
+    }
   }
 });
+
 
 module.exports = router;
