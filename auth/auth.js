@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const model = require("../models/index");
 const bcrypt = require("bcryptjs");
-require("dotenv").config();
 
 router.post("/register", async (req, res) => {
   const { name, email, username, password } = req.body;
