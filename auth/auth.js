@@ -6,7 +6,8 @@ const passport = require("passport");
 
 router.post(
   "/login",
-  passport.authenticate("local", { failureRedirect: "/auth/error" }),
+  passport.authenticate("local", { 
+    successRedirect:'/dashboard' }),
   function(req, res) {
     res.json({
       message: "Berhasil Login",
@@ -58,16 +59,5 @@ router.post("/register", async (req, res) => {
     });
   }
 });
-
-router.get("/dashboard", (req, res) =>
-  res.send("Welcome " + req.user.username + "!!")
-);
-
-router.get("/error", (req, res) =>
-  res.status(400).json({
-    status: "Error",
-    message: "Please Try Again"
-  })
-);
 
 module.exports = router;

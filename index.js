@@ -4,8 +4,9 @@ const passport = require("passport");
 const session = require("express-session");
 const auth = require("./auth/auth");
 const port = 5000;
+const router = require("./route/index");
 
-app.use(express.json())
+app.use(express.json());
 
 //Passport Config
 require("./config/passport")(passport);
@@ -27,23 +28,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/auth", auth);
-
-app.get("/", (req, res) => {
-  res.send("Test")
-});
-
-app.get("/test", isLoggedIn, (req, res) => {
-  res.json({
-    message: "Berhasil login"
-  });
-});
-
-function isLoggedIn(request, response, next) {
-  if (request.isAuthenticated()) {
-    return next();
-  }
-  response.redirect("/error");
-}
+app.use('/', require('./route/index.js'));
 
 app.listen(port, () => {
   console.log("Listening to " + port);
