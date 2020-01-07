@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const notes = require("./notes");
+const auth = require("../auth/auth");
 const { isLogin } = require("../auth/middleware");
 
 //Welcome page
@@ -22,5 +24,8 @@ router.get("/error", (req, res) =>
     message: "Please Try Again"
   })
 );
+
+router.use("/auth", auth);
+router.use("/notes", isLogin, notes);
 
 module.exports = router;
