@@ -31,4 +31,29 @@ router.post("/add", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  try {
+    const notes = await model.notes.findAll({
+      where: { author: req.user.id }
+    });
+    if (notes) {
+      res.status(200).json({
+        status: "Found",
+        message: "Your notes",
+        data: notes
+      });
+    } else {
+      res.status(400).json({
+        status: "Not Found",
+        message: "Notes not found"
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      status: "Error",
+      message: "Error when notes"
+    });
+  }
+});
+
 module.exports = router;
