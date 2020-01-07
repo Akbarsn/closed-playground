@@ -1,7 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const notes = sequelize.define('notes', {
-    header: DataTypes.STRING,
+    title: DataTypes.STRING,
     description: DataTypes.STRING,
     author: DataTypes.INTEGER
   }, {});
