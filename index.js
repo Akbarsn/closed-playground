@@ -2,51 +2,35 @@ const express = require("express");
 const app = express();
 const passport = require("passport");
 const session = require("express-session");
-const users = require("./auth/auth");
-const model = require("./models/index");
+const auth = require("./auth/auth");
 const port = 5000;
 
-app.use(express.json());
+app.use(express.json())
+
+//Passport Config
+require("./config/passport")(passport);
+
+//Express body parser
+app.use(express.urlencoded({ extended: true }));
+
+//Express session config
 app.use(
   session({
-    secret: "qwertyuiop",
-    resave: false,
-    saveUninitialized: false
+    secret: "secret",
+    resave: true,
+    saveUninitialized: true
   })
 );
 
+//Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser(function(user, cb) {
-  cb(null, user.id);
+app.use("/auth", auth);
+
+app.get("/", (req, res) => {
+  res.send("Test")
 });
-
-passport.deserializeUser(async function(id, cb) {
-  try {
-    const user = await model.users.findOne({ where: { id: id } });
-    if (user) {
-      cb(null, user);
-    } else {
-      cb(null, false);
-    }
-  } catch (err) {
-    cb(err);
-  }
-});
-
-app.get("/success", (req, res) =>
-  res.send("Welcome " + req.query.username + "!!")
-);
-
-app.get("/error", (req, res) =>
-  res.status(400).json({
-    status: "Error",
-    message: "Please Try Again"
-  })
-);
-
-app.use("/auth", users);
 
 app.get("/test", isLoggedIn, (req, res) => {
   res.json({
