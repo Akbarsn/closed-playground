@@ -39,6 +39,16 @@ function notFound(req, res, next) {
 
 app.use(notFound);
 
+function errorHandler(err, req, res, next) {
+  res.status(res.statusCode || 500);
+  res.json({
+    message: 'Error',
+    error: err.message
+  });
+}
+
+app.use(errorHandler);
+
 app.listen(port, () => {
   console.log("Listening to " + port);
 });
