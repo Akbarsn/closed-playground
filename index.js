@@ -4,7 +4,6 @@ const passport = require("passport");
 const session = require("express-session");
 const auth = require("./auth/auth");
 const port = 5000;
-const router = require("./route/index");
 
 app.use(express.json());
 
@@ -29,6 +28,16 @@ app.use(passport.session());
 
 app.use("/auth", auth);
 app.use('/', require('./route/index.js'));
+
+function notFound(req, res, next) {
+  res.status(404);
+  res.json({
+    status:"Error",
+    message:"Oops, page not found, try again later"
+  })
+}
+
+app.use(notFound);
 
 app.listen(port, () => {
   console.log("Listening to " + port);
