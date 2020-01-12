@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const model = require("../models/index");
 
+//Route for Adding Notes
 router.post("/add", async (req, res) => {
   const { title, description } = req.body;
   const author = req.user.id;
@@ -31,6 +32,7 @@ router.post("/add", async (req, res) => {
   }
 });
 
+//Route for Get All Notes
 router.get("/", async (req, res) => {
   try {
     const notes = await model.notes.findAll({
