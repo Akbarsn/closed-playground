@@ -41,7 +41,7 @@ router.get("/", async (req, res) => {
     if (notes) {
       res.status(200).json({
         status: "Found",
-        message: "Your notes",
+        message: "Getting all your notes",
         data: notes
       });
     } else {
@@ -53,7 +53,57 @@ router.get("/", async (req, res) => {
   } catch (err) {
     res.status(500).json({
       status: "Error",
-      message: "Error when notes"
+      message: "Error getting notes"
+    });
+  }
+});
+
+router.put("/:id", async (req, res) => {
+  const { title, description } = req.body;
+  try {
+    const checkNote = await model.notes.findOne({
+      where: { id: req.params.id }
+    });
+    if (checkNote) {
+      if (checkNote.author === req.user.id) {
+        const updateNote = await model.notes.update(
+          {
+            title: title,
+            description: description
+          },
+          { where: { id: req.params.id } }
+        );
+        const note = await model.notes.findOne({
+          where: { id: req.params.id }
+        });
+        if (updateNote) {
+          res.json({
+            status: "Updated",
+            message: "Note already updated",
+            data: note
+          });
+        } else {
+          res.status(400).json({
+            status: "Error",
+            message: "Notes failed to updated"
+          });
+        }
+      } else {
+        res.status(401).json({
+          status: "Error",
+          message: "Unauthorized"
+        });
+      }
+    } else {
+      res.status(400).json({
+        status: "Error",
+        message: "Notes not found"
+      });
+    }
+  } catch (err) {
+    res.status(401).json({
+      status: "Error",
+      message: "There's Error in Updating Notes"
     });
   }
 });
