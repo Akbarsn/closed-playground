@@ -109,6 +109,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+//Route for delete notes
 router.delete("/:id", (req, res) => {
   model.notes
     .destroy({ where: { id: req.params.id } })
