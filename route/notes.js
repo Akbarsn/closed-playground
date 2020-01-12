@@ -58,6 +58,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//Route for update note
 router.put("/:id", async (req, res) => {
   const { title, description } = req.body;
   try {
