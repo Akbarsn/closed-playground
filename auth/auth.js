@@ -6,8 +6,10 @@ const passport = require("passport");
 
 router.post(
   "/login",
-  passport.authenticate("local", { 
-    successRedirect:'/dashboard' }),
+  passport.authenticate("local", {
+    successRedirect: "/dashboard",
+    failureRedirect: "/error"
+  }),
   function(req, res) {
     res.json({
       message: "Berhasil Login",
